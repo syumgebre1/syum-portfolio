@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1020" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <title>Portfolio Admin — Syum</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="admin.css" />
+    <link rel="stylesheet" href="admin-inbox.css" />
+    <script type="module" src="admin.js"></script>
+  </head>
+  <body>
+    <header class="admin-topbar">
+      <a class="admin-brand" href="index.html"><span class="brand-mark">STG<span>.</span></span><span>PORTFOLIO ADMIN</span></a>
+      <div class="topbar-actions"><a class="public-link" href="index.html" target="_blank" rel="noreferrer">View portfolio ↗</a><button id="sign-out" class="button button-quiet" type="button" hidden>Sign out</button></div>
+    </header>
+
+    <main class="admin-main">
+      <section id="setup-message" class="notice-card" hidden>
+        <p class="eyebrow">ONE-TIME SETUP</p>
+        <h1>Connect your Supabase project</h1>
+        <p>The admin is ready, but the project URL and public anon key haven’t been added yet. Follow the checklist in <strong>SUPABASE-SETUP.md</strong>, then reopen this page.</p>
+      </section>
+
+      <section id="login-card" class="login-card" hidden>
+        <p class="eyebrow">PRIVATE CONTENT MANAGER</p>
+        <h1>Welcome back.</h1>
+        <p class="muted">Sign in to update your portfolio content.</p>
+        <form id="login-form" class="form-stack">
+          <label>Email address<input name="email" type="email" autocomplete="username" required /></label>
+          <label>Password<input name="password" type="password" autocomplete="current-password" required /></label>
+          <button class="button button-primary" type="submit">Sign in <span aria-hidden="true">↗</span></button>
+          <p id="login-error" class="form-message" role="status"></p>
+        </form>
+      </section>
+
+      <section id="dashboard" hidden>
+        <div class="dashboard-heading"><div><p class="eyebrow">YOUR WEBSITE, YOUR CONTENT</p><h1>Good to see you.</h1><p class="muted">Manage your public portfolio without editing code.</p></div><span class="secure-badge"><i></i> PRIVATE ADMIN</span></div>
+        <div class="dashboard-layout">
+          <aside class="manager-sidebar" aria-label="Content sections"><p class="eyebrow">CONTENT</p><nav id="section-nav"></nav><p class="sidebar-note">Saved changes are published to your portfolio as soon as you save.</p></aside>
+          <section class="manager-panel" aria-live="polite">
+            <div class="panel-heading"><div><p id="section-kicker" class="eyebrow"></p><h2 id="section-title"></h2></div><button id="add-record" class="button button-primary" type="button">＋ Add new</button></div>
+            <p id="panel-message" class="panel-message" role="status"></p>
+            <div id="record-list" class="record-list"></div>
+            <div id="message-list" class="message-list" hidden></div>
+            <form id="record-form" class="record-form" hidden>
+              <div class="form-heading"><h3 id="form-title"></h3><button id="cancel-form" class="button button-quiet" type="button">Cancel</button></div>
+              <div id="form-fields" class="form-fields"></div>
+              <p id="form-error" class="form-message" role="status"></p>
+              <button class="button button-primary" type="submit">Save changes <span aria-hidden="true">↗</span></button>
+            </form>
+          </section>
+        </div>
+      </section>
+    </main>
+    <footer class="admin-footer"><span>Syum Teame Gebreyesus · Portfolio CMS</span><a href="index.html">Back to portfolio</a></footer>
+  </body>
+</html>
