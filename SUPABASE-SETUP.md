@@ -14,18 +14,17 @@ Your portfolio now has a private admin page at `admin.html`. After the one-time 
 
 1. In Supabase, open **Authentication → Users** and add your email address with a strong password. Confirm the user if prompted.
 2. In **Authentication → Providers / Sign-in**, disable public email sign-ups. Add only your own admin user from the dashboard. This is important: anyone with an account in this project can edit the portfolio, so do not create accounts for visitors.
-3. In **Authentication → URL Configuration**, set the Site URL to your published website address. Add the website address and its `/admin.html` address to the allowed redirect URLs when deploying.
+3. In **Authentication → URL Configuration**, set the Site URL to your production website base URL. Add the deployed site's `/**` wildcard to the allowed redirect URLs so the admin page is included.
 
 ## 3. Publish the website
 
-The current site is a set of static files and is not online yet. A simple option for publishing is Netlify:
+This is a plain static site. Deploy from the repository root; no build command or framework is needed. The included `netlify.toml` sets the publish directory to `.`.
 
-1. Create a Netlify account and choose its manual deploy / drag-and-drop option.
-2. Upload the website folder, including the HTML, CSS, JavaScript, and `supabase-config.js` files. Do not upload private passwords or service-role keys.
-3. Open the generated public website URL. The home page should show the starter content; append `/admin.html` to that URL to sign in and manage it.
-4. If you later connect a custom domain, update the Supabase **Site URL** and allowed redirect URLs to use that domain.
+For Netlify, import the existing GitHub repository `syumgebre1/syum-portfolio`. Confirm the build command is empty and the publish directory is `.` (the repository root). Deploy the site, then use its HTTPS Netlify URL. The homepage should open at the site root; `/admin.html` opens the private admin sign-in.
 
-Use the deployed HTTPS address to sign in and upload files. Opening the HTML directly as a `file://` page is not suitable for Supabase login or browser modules.
+After Netlify assigns the production domain, update Supabase **Authentication → URL Configuration**: set **Site URL** to the Netlify production base URL (for example, `https://your-site.netlify.app`) and add `https://your-site.netlify.app/**` under allowed **Redirect URLs**. Keep the GitHub Pages address there too if you continue to use that copy of the site. If you later connect a custom domain, add its wildcard redirect and use its HTTPS base URL as the Site URL.
+
+Deploy over HTTPS. Opening HTML directly with a `file://` URL is not suitable for Supabase login or browser modules.
 
 ## Using the admin
 
