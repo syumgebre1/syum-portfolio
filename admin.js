@@ -19,6 +19,7 @@ const definitions = {
       ["exit_score", "Exit exam score", "text", false],
       ["graduation_year", "Graduation year", "text", false],
       ["photo_path", "Profile photo", "file", false],
+      ["cv_path", "CV file (PDF)", "file", false],
     ],
   },
   projects: {
@@ -115,6 +116,9 @@ const elements = {
   formError: document.querySelector("#form-error"),
   cancel: document.querySelector("#cancel-form"),
   messageList: document.querySelector("#message-list"),
+  settingsPanel: document.querySelector("#settings-panel"),
+  settingsForm: document.querySelector("#settings-form"),
+  settingsError: document.querySelector("#settings-error"),
 };
 
 let activeKey = "projects";
@@ -200,6 +204,14 @@ function createNav() {
   unreadCount.dataset.count = "messages";
   inboxButton.append(unreadCount);
   elements.nav.append(inboxButton);
+
+  const settingsButton = document.createElement("button");
+  settingsButton.type = "button";
+  settingsButton.className = "section-button";
+  settingsButton.dataset.section = "settings";
+  settingsButton.setAttribute("aria-current", String(activeKey === "settings"));
+  settingsButton.textContent = "Contact / Social";
+  elements.nav.append(settingsButton);
 }
 
 function renderMessages(messages) {
@@ -254,6 +266,7 @@ async function loadMessages() {
   elements.messageList.hidden = false;
   elements.form.hidden = true;
   elements.add.hidden = true;
+  elements.settingsPanel.hidden = true;
   const { data, error } = await supabase
     .from(TABLES.messages)
     .select("id, name, email, subject, message, created_at, read_at")
@@ -263,6 +276,42 @@ async function loadMessages() {
   elements.title.textContent = "Contact messages";
   elements.kicker.textContent = "INBOX / PRIVATE MESSAGES";
   elements.message.textContent = "Only signed-in admins can view these messages.";
+}
+
+async function loadSettings() {
+  const { data, error } = await supabase
+    .from(TABLES.settings)
+    .select("whatsapp_number, telegram_username")
+    .eq("id", 1)
+    .maybeSingle();
+  if (error) throw error;
+  return {
+    whatsapp_number: data?.whatsapp_number ?? "",
+    telegram_username: data?.telegram_username ?? "",
+  };
+}
+
+async function showSettingsPanel() {
+  elements.message.textContent = "Loading contact details…";
+  elements.list.hidden = true;
+  elements.messageList.hidden = true;
+  elements.form.hidden = true;
+  elements.add.hidden = true;
+  elements.settingsError.textContent = "";
+  elements.settingsForm.reset();
+  elements.settingsPanel.hidden = false;
+
+  elements.title.textContent = "Contact / Social";
+  elements.kicker.textContent = "MANAGE / SITE SETTINGS";
+  elements.message.textContent = "These details appear on your public portfolio.";
+
+  try {
+    const current = await loadSettings();
+    elements.settingsForm.elements.whatsapp_number.value = current.whatsapp_number;
+    elements.settingsForm.elements.telegram_username.value = current.telegram_username;
+  } catch (error) {
+    showError(elements.settingsError, error);
+  }
 }
 
 function previewText(record) {
@@ -324,6 +373,7 @@ async function loadRecords() {
   const definition = definitions[activeKey];
   elements.message.textContent = "Loading…";
   elements.messageList.hidden = true;
+  elements.settingsPanel.hidden = true;
   elements.list.hidden = false;
   elements.list.replaceChildren();
   const query = definition.singleton
@@ -420,6 +470,41 @@ async function saveRecord(event) {
   }
 }
 
+async function saveSettings(event) {
+  event.preventDefault();
+  elements.settingsError.textContent = "";
+
+  const form = elements.settingsForm;
+  const wa = form.elements.whatsapp_number.value.replace(/\D/g, "");
+  const tg = form.elements.telegram_username.value.replace(/^@+/, "").trim();
+
+  if (wa && !/^\d{8,15}$/.test(wa)) {
+    elements.settingsError.textContent = "WhatsApp number must be 8–15 digits, including the country code.";
+    return;
+  }
+  if (tg && !/^[A-Za-z0-9_]{3,32}$/.test(tg)) {
+    elements.settingsError.textContent = "Telegram username must be 3–32 characters (letters, numbers, underscore).";
+    return;
+  }
+
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
+
+  try {
+    const { error } = await supabase
+      .from(TABLES.settings)
+      .upsert({ id: 1, whatsapp_number: wa, telegram_username: tg, updated_at: new Date().toISOString() }, { onConflict: "id" });
+    if (error) throw error;
+    form.elements.whatsapp_number.value = wa;
+    form.elements.telegram_username.value = tg;
+    elements.settingsError.textContent = "Saved. Your portfolio will show the new links on next load.";
+  } catch (error) {
+    showError(elements.settingsError, error);
+  } finally {
+    if (submitButton) submitButton.disabled = false;
+  }
+}
+
 async function removeRecord(id) {
   const record = activeRecord;
   if (!window.confirm("Delete this item from your portfolio? This cannot be undone.")) return;
@@ -435,12 +520,12 @@ async function removeRecord(id) {
 }
 
 function setSection(key) {
-  if (key !== "messages" && !definitions[key]) return;
+  if (key !== "messages" && key !== "settings" && !definitions[key]) return;
   activeKey = key;
   activeRecord = null;
   elements.form.hidden = true;
   createNav();
-  const load = key === "messages" ? loadMessages : loadRecords;
+  const load = key === "messages" ? loadMessages : key === "settings" ? showSettingsPanel : loadRecords;
   load().catch((error) => showError(elements.message, error));
 }
 
@@ -486,6 +571,8 @@ elements.nav.addEventListener("click", (event) => {
 elements.add.addEventListener("click", () => openForm());
 elements.cancel.addEventListener("click", closeForm);
 elements.form.addEventListener("submit", saveRecord);
+
+if (elements.settingsForm) elements.settingsForm.addEventListener("submit", saveSettings);
 
 elements.list.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-action]");

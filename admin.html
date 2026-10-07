@@ -53,6 +53,42 @@
               <p id="form-error" class="form-message" role="status"></p>
               <button class="button button-primary" type="submit">Save changes <span aria-hidden="true">↗</span></button>
             </form>
+
+            <!-- SITE SETTINGS — WhatsApp + Telegram contact details -->
+            <section id="settings-panel" class="record-form" hidden>
+              <div class="form-heading">
+                <h3>Contact details</h3>
+              </div>
+              <form id="settings-form" class="form-stack">
+                <label>
+                  WhatsApp number
+                  <input
+                    name="whatsapp_number"
+                    type="tel"
+                    inputmode="numeric"
+                    placeholder="251912345678"
+                    pattern="[0-9]{0,15}"
+                    autocomplete="off"
+                  />
+                  <small class="muted">Digits only, with country code. No <code>+</code> or spaces.</small>
+                </label>
+                <label>
+                  Telegram username
+                  <input
+                    name="telegram_username"
+                    type="text"
+                    placeholder="syum_teame"
+                    pattern="[A-Za-z0-9_]{0,32}"
+                    autocomplete="off"
+                  />
+                  <small class="muted">Without the <code>@</code>. Letters, numbers, and underscore.</small>
+                </label>
+                <p id="settings-error" class="form-message" role="status"></p>
+                <button class="button button-primary" type="submit">
+                  Save contact details <span aria-hidden="true">↗</span>
+                </button>
+              </form>
+            </section>
           </section>
         </div>
       </section>

@@ -86,6 +86,16 @@ create table if not exists public.portfolio_highlights (
   created_at timestamptz not null default now()
 );
 
+-- Single-row table for editable site-wide contact details (WhatsApp + Telegram).
+-- Public can read it (the portfolio site uses it to build the contact links);
+-- only signed-in admins can change it.
+create table if not exists public.site_settings (
+  id integer primary key default 1 check (id = 1),
+  whatsapp_number text not null default '' check (whatsapp_number ~ '^[0-9]{0,15}$'),
+  telegram_username text not null default '' check (telegram_username ~ '^[A-Za-z0-9_]{0,32}$'),
+  updated_at timestamptz not null default now()
+);
+
 -- Public contact form submissions. Visitors may submit only; admins can read and update inbox status.
 create table if not exists public.contact_messages (
   id uuid primary key default gen_random_uuid(),
@@ -123,7 +133,7 @@ begin
   foreach table_name in array array[
     'portfolio_profile', 'portfolio_projects', 'portfolio_certificates',
     'portfolio_experience', 'portfolio_education', 'portfolio_skills',
-    'portfolio_highlights'
+    'portfolio_highlights', 'site_settings'
   ] loop
     execute format('alter table public.%I enable row level security', table_name);
     execute format('drop policy if exists "Public can read %1$s" on public.%1$I', table_name);
@@ -181,10 +191,10 @@ notify pgrst, 'reload schema';
 
 grant select on public.portfolio_profile, public.portfolio_projects, public.portfolio_certificates,
   public.portfolio_experience, public.portfolio_education, public.portfolio_skills,
-  public.portfolio_highlights to anon, authenticated;
+  public.portfolio_highlights, public.site_settings to anon, authenticated;
 grant insert, update, delete on public.portfolio_profile, public.portfolio_projects,
   public.portfolio_certificates, public.portfolio_experience, public.portfolio_education,
-  public.portfolio_skills, public.portfolio_highlights to authenticated;
+  public.portfolio_skills, public.portfolio_highlights, public.site_settings to authenticated;
 
 -- Create a public-read bucket. Upload, update, and delete are restricted to signed-in admins.
 insert into storage.buckets (id, name, public)
@@ -219,6 +229,11 @@ values (
   'Computer engineering graduate and software developer focused on thoughtful web and mobile experiences.',
   'I graduated from Aksum University with a BSc in Electrical and Computer Engineering, specializing in Computer Engineering. My experience spans the MERN stack, React Native, Python, databases, networking, and application security.'
 )
+on conflict (id) do nothing;
+
+-- Default (empty) row for contact settings. Fill it in from the admin.
+insert into public.site_settings (id, whatsapp_number, telegram_username)
+values (1, '', '')
 on conflict (id) do nothing;
 
 insert into public.portfolio_projects (title, description, technologies, sort_order) values

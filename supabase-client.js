@@ -15,6 +15,7 @@ export const TABLES = {
   skills: "portfolio_skills",
   highlights: "portfolio_highlights",
   messages: "contact_messages",
+  settings: "site_settings",
 };
 
 export function publicFileUrl(path) {
