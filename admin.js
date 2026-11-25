@@ -1,5 +1,12 @@
+// admin.js
+
 import { isSupabaseConfigured, supabase, TABLES } from "./supabase-client.js";
 
+// ---------------------------------------------------------------------------
+// FIELD DEFINITIONS
+// This object controls exactly what fields appear in the admin forms.
+// Format: [name, label, type, required, options?]
+// ---------------------------------------------------------------------------
 const definitions = {
   profile: {
     title: "Profile & contact",
@@ -15,9 +22,13 @@ const definitions = {
       ["linkedin", "LinkedIn URL", "url", false],
       ["github", "GitHub URL", "url", false],
       ["phone", "Public phone (optional)", "tel", false],
-      ["cgpa", "CGPA", "text", false],
-      ["exit_score", "Exit exam score", "text", false],
-      ["graduation_year", "Graduation year", "text", false],
+      
+      // New fields for the dynamic hero/about sections
+      ["now_learning", "Currently learning...", "text", false],
+      ["availability_status", "Availability status", "select", false, ["open", "freelance", "closed"]],
+      ["available_from", "Available from (e.g., March 2026)", "text", false],
+      
+      // File uploads
       ["photo_path", "Profile photo", "file", false],
       ["cv_path", "CV file (PDF)", "file", false],
     ],
@@ -29,8 +40,9 @@ const definitions = {
       ["title", "Project name", "text", true],
       ["description", "Description", "textarea", true],
       ["technologies", "Technologies (separate with commas)", "array", false],
-      ["project_url", "Project link", "url", false],
-      ["image_path", "Project image", "file", false],
+      ["project_url", "Live demo link", "url", false],
+      ["repo_url", "Source code link (GitHub)", "url", false],
+      ["image_path", "Project screenshot", "file", false],
       ["sort_order", "Display order (smaller numbers first)", "number", false],
     ],
   },
@@ -41,7 +53,7 @@ const definitions = {
       ["title", "Certificate name", "text", true],
       ["issuer", "Issuing organization", "text", true],
       ["issued_on", "Date or year", "text", false],
-      ["credential_url", "Credential link", "url", false],
+      ["credential_url", "Credential link (if public)", "url", false],
       ["file_path", "Certificate file or image", "file", false],
       ["sort_order", "Display order (smaller numbers first)", "number", false],
     ],
@@ -69,8 +81,6 @@ const definitions = {
       ["graduation_date", "Graduation date", "text", false],
       ["details", "Additional details", "textarea", false],
       ["coursework", "Relevant coursework (separate with commas)", "array", false],
-      ["cgpa", "CGPA", "text", false],
-      ["exit_score", "Exit exam score", "text", false],
       ["sort_order", "Display order (smaller numbers first)", "number", false],
     ],
   },
@@ -97,6 +107,9 @@ const definitions = {
   },
 };
 
+// ---------------------------------------------------------------------------
+// DOM ELEMENTS
+// ---------------------------------------------------------------------------
 const elements = {
   setup: document.querySelector("#setup-message"),
   login: document.querySelector("#login-card"),
@@ -124,6 +137,9 @@ const elements = {
 let activeKey = "projects";
 let activeRecord = null;
 
+// ---------------------------------------------------------------------------
+// HELPER FUNCTIONS
+// ---------------------------------------------------------------------------
 function setSignedIn(isSignedIn) {
   elements.login.hidden = isSignedIn;
   elements.dashboard.hidden = !isSignedIn;
@@ -134,13 +150,20 @@ function showError(element, error) {
   element.textContent = error?.message || String(error);
 }
 
+function safeFileName(name) {
+  return name.normalize("NFKD").replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(-100) || "upload";
+}
+
+// Creates the actual HTML input elements based on the field definition
 function makeField(field, record = {}) {
   const [name, label, type, required, options] = field;
   const wrapper = document.createElement("div");
   wrapper.className = `field${type === "textarea" || type === "file" || type === "array" ? " full" : ""}`;
+  
   const labelElement = document.createElement("label");
   labelElement.htmlFor = `field-${name}`;
   labelElement.textContent = label;
+  
   let input;
 
   if (type === "textarea") {
@@ -167,6 +190,7 @@ function makeField(field, record = {}) {
   input.id = `field-${name}`;
   input.name = name;
   if (required) input.required = true;
+  
   if (type === "file") {
     const note = document.createElement("small");
     const allowedFileTypes = name === "photo_path" || name === "image_path" ? "image" : "image or PDF";
@@ -178,6 +202,9 @@ function makeField(field, record = {}) {
   return wrapper;
 }
 
+// ---------------------------------------------------------------------------
+// NAVIGATION & RENDERING
+// ---------------------------------------------------------------------------
 function createNav() {
   elements.nav.replaceChildren();
   for (const [key, definition] of Object.entries(definitions)) {
@@ -193,6 +220,8 @@ function createNav() {
     button.append(count);
     elements.nav.append(button);
   }
+  
+  // Add Messages to nav
   const inboxButton = document.createElement("button");
   inboxButton.type = "button";
   inboxButton.className = "section-button";
@@ -205,6 +234,7 @@ function createNav() {
   inboxButton.append(unreadCount);
   elements.nav.append(inboxButton);
 
+  // Add Settings to nav
   const settingsButton = document.createElement("button");
   settingsButton.type = "button";
   settingsButton.className = "section-button";
@@ -212,106 +242,6 @@ function createNav() {
   settingsButton.setAttribute("aria-current", String(activeKey === "settings"));
   settingsButton.textContent = "Contact / Social";
   elements.nav.append(settingsButton);
-}
-
-function renderMessages(messages) {
-  elements.messageList.replaceChildren();
-  const count = document.querySelector('[data-count="messages"]');
-  const unread = messages.filter((message) => !message.read_at).length;
-  if (count) count.textContent = unread ? `${unread} new` : String(messages.length);
-  if (!messages.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty-state";
-    empty.textContent = "No messages yet. New contact form submissions will appear here.";
-    elements.messageList.append(empty);
-    return;
-  }
-
-  for (const message of messages) {
-    const article = document.createElement("article");
-    article.className = `inbox-message${message.read_at ? " is-read" : " is-unread"}`;
-    const heading = document.createElement("div");
-    heading.className = "inbox-message-heading";
-    const sender = document.createElement("div");
-    const name = document.createElement("strong");
-    name.textContent = message.name;
-    const email = document.createElement("a");
-    email.href = `mailto:${message.email}`;
-    email.textContent = message.email;
-    sender.append(name, email);
-    const date = document.createElement("time");
-    date.dateTime = message.created_at;
-    date.textContent = new Date(message.created_at).toLocaleString();
-    heading.append(sender, date);
-    const subject = document.createElement("h3");
-    subject.textContent = message.subject || "No subject";
-    const body = document.createElement("p");
-    body.textContent = message.message;
-    article.append(heading, subject, body);
-    if (!message.read_at) {
-      const markRead = document.createElement("button");
-      markRead.type = "button";
-      markRead.className = "inbox-mark-read";
-      markRead.dataset.messageId = message.id;
-      markRead.textContent = "Mark as read";
-      article.append(markRead);
-    }
-    elements.messageList.append(article);
-  }
-}
-
-async function loadMessages() {
-  elements.message.textContent = "Loading messages…";
-  elements.list.hidden = true;
-  elements.messageList.hidden = false;
-  elements.form.hidden = true;
-  elements.add.hidden = true;
-  elements.settingsPanel.hidden = true;
-  const { data, error } = await supabase
-    .from(TABLES.messages)
-    .select("id, name, email, subject, message, created_at, read_at")
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  renderMessages(data || []);
-  elements.title.textContent = "Contact messages";
-  elements.kicker.textContent = "INBOX / PRIVATE MESSAGES";
-  elements.message.textContent = "Only signed-in admins can view these messages.";
-}
-
-async function loadSettings() {
-  const { data, error } = await supabase
-    .from(TABLES.settings)
-    .select("whatsapp_number, telegram_username")
-    .eq("id", 1)
-    .maybeSingle();
-  if (error) throw error;
-  return {
-    whatsapp_number: data?.whatsapp_number ?? "",
-    telegram_username: data?.telegram_username ?? "",
-  };
-}
-
-async function showSettingsPanel() {
-  elements.message.textContent = "Loading contact details…";
-  elements.list.hidden = true;
-  elements.messageList.hidden = true;
-  elements.form.hidden = true;
-  elements.add.hidden = true;
-  elements.settingsError.textContent = "";
-  elements.settingsForm.reset();
-  elements.settingsPanel.hidden = false;
-
-  elements.title.textContent = "Contact / Social";
-  elements.kicker.textContent = "MANAGE / SITE SETTINGS";
-  elements.message.textContent = "These details appear on your public portfolio.";
-
-  try {
-    const current = await loadSettings();
-    elements.settingsForm.elements.whatsapp_number.value = current.whatsapp_number;
-    elements.settingsForm.elements.telegram_username.value = current.telegram_username;
-  } catch (error) {
-    showError(elements.settingsError, error);
-  }
 }
 
 function previewText(record) {
@@ -369,6 +299,9 @@ function renderRecords(records) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// DATA LOADING
+// ---------------------------------------------------------------------------
 async function loadRecords() {
   const definition = definitions[activeKey];
   elements.message.textContent = "Loading…";
@@ -376,9 +309,11 @@ async function loadRecords() {
   elements.settingsPanel.hidden = true;
   elements.list.hidden = false;
   elements.list.replaceChildren();
+  
   const query = definition.singleton
     ? await supabase.from(definition.table).select("*").maybeSingle()
     : await supabase.from(definition.table).select("*").order("sort_order", { ascending: true });
+    
   if (query.error) throw query.error;
   const records = definition.singleton ? (query.data ? [query.data] : []) : query.data || [];
   renderRecords(records);
@@ -388,12 +323,104 @@ async function loadRecords() {
   elements.add.hidden = definition.singleton;
 }
 
+async function loadMessages() {
+  elements.message.textContent = "Loading messages…";
+  elements.list.hidden = true;
+  elements.messageList.hidden = false;
+  elements.form.hidden = true;
+  elements.add.hidden = true;
+  elements.settingsPanel.hidden = true;
+  
+  const { data, error } = await supabase
+    .from(TABLES.messages)
+    .select("id, name, email, subject, message, created_at, read_at")
+    .order("created_at", { ascending: false });
+    
+  if (error) throw error;
+  
+  elements.messageList.replaceChildren();
+  const count = document.querySelector('[data-count="messages"]');
+  const unread = data.filter((message) => !message.read_at).length;
+  if (count) count.textContent = unread ? `${unread} new` : String(data.length);
+  
+  if (!data.length) {
+    elements.messageList.innerHTML = '<div class="empty-state">No messages yet. New contact form submissions will appear here.</div>';
+    return;
+  }
+
+  for (const message of data) {
+    const article = document.createElement("article");
+    article.className = `inbox-message${message.read_at ? " is-read" : " is-unread"}`;
+    article.innerHTML = `
+      <div class="inbox-message-heading">
+        <div><strong>${message.name}</strong><a href="mailto:${message.email}">${message.email}</a></div>
+        <time>${new Date(message.created_at).toLocaleString()}</time>
+      </div>
+      <h3>${message.subject || "No subject"}</h3>
+      <p>${message.message}</p>
+    `;
+    if (!message.read_at) {
+      const markRead = document.createElement("button");
+      markRead.type = "button";
+      markRead.className = "inbox-mark-read";
+      markRead.dataset.messageId = message.id;
+      markRead.textContent = "Mark as read";
+      article.append(markRead);
+    }
+    elements.messageList.append(article);
+  }
+
+  elements.title.textContent = "Contact messages";
+  elements.kicker.textContent = "INBOX / PRIVATE MESSAGES";
+  elements.message.textContent = "Only signed-in admins can view these messages.";
+}
+
+async function loadSettings() {
+  const { data, error } = await supabase
+    .from(TABLES.settings)
+    .select("whatsapp_number, telegram_username")
+    .eq("id", 1)
+    .maybeSingle();
+  if (error) throw error;
+  return { whatsapp_number: data?.whatsapp_number ?? "", telegram_username: data?.telegram_username ?? "" };
+}
+
+async function showSettingsPanel() {
+  elements.message.textContent = "Loading contact details…";
+  elements.list.hidden = true;
+  elements.messageList.hidden = true;
+  elements.form.hidden = true;
+  elements.add.hidden = true;
+  elements.settingsError.textContent = "";
+  elements.settingsForm.reset();
+  elements.settingsPanel.hidden = false;
+
+  elements.title.textContent = "Contact / Social";
+  elements.kicker.textContent = "MANAGE / SITE SETTINGS";
+  elements.message.textContent = "These details appear on your public portfolio.";
+
+  try {
+    const current = await loadSettings();
+    elements.settingsForm.elements.whatsapp_number.value = current.whatsapp_number;
+    elements.settingsForm.elements.telegram_username.value = current.telegram_username;
+  } catch (error) {
+    showError(elements.settingsError, error);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// CRUD ACTIONS (Create, Read, Update, Delete)
+// ---------------------------------------------------------------------------
 function openForm(record = null) {
   activeRecord = record;
   elements.form.reset();
   elements.formFields.replaceChildren();
   const definition = definitions[activeKey];
-  for (const field of definition.fields) elements.formFields.append(makeField(field, record || {}));
+  
+  for (const field of definition.fields) {
+    elements.formFields.append(makeField(field, record || {}));
+  }
+  
   elements.formTitle.textContent = record ? (definition.singleton ? "Edit profile" : "Edit item") : "Add new item";
   elements.formError.textContent = "";
   elements.form.hidden = false;
@@ -426,10 +453,6 @@ function formData() {
   return values;
 }
 
-function safeFileName(name) {
-  return name.normalize("NFKD").replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(-100) || "upload";
-}
-
 async function uploadSelectedFiles(values) {
   for (const field of definitions[activeKey].fields) {
     const [name, , type] = field;
@@ -438,6 +461,8 @@ async function uploadSelectedFiles(values) {
     const file = input.files?.[0];
     if (!file) continue;
     if (file.size > 10 * 1024 * 1024) throw new Error("Each upload must be 10 MB or smaller.");
+    
+    // Create a unique path: e.g. "profile/abc-123-cv.pdf"
     const path = `${activeKey}/${crypto.randomUUID()}-${safeFileName(file.name)}`;
     const { error } = await supabase.storage.from("portfolio-files").upload(path, file, { cacheControl: "3600", upsert: false });
     if (error) throw error;
@@ -450,6 +475,7 @@ async function saveRecord(event) {
   elements.formError.textContent = "";
   const definition = definitions[activeKey];
   const values = formData();
+  
   try {
     await uploadSelectedFiles(values);
     let query;
@@ -497,8 +523,10 @@ async function saveSettings(event) {
     if (error) throw error;
     form.elements.whatsapp_number.value = wa;
     form.elements.telegram_username.value = tg;
+    elements.settingsError.style.color = "var(--accent)";
     elements.settingsError.textContent = "Saved. Your portfolio will show the new links on next load.";
   } catch (error) {
+    elements.settingsError.style.color = "var(--error)";
     showError(elements.settingsError, error);
   } finally {
     if (submitButton) submitButton.disabled = false;
@@ -519,6 +547,9 @@ async function removeRecord(id) {
   await loadRecords();
 }
 
+// ---------------------------------------------------------------------------
+// EVENT LISTENERS
+// ---------------------------------------------------------------------------
 function setSection(key) {
   if (key !== "messages" && key !== "settings" && !definitions[key]) return;
   activeKey = key;
@@ -539,6 +570,7 @@ async function startDashboard() {
   }
 }
 
+// INIT
 if (!isSupabaseConfigured) {
   elements.setup.hidden = false;
 } else {
@@ -578,6 +610,7 @@ elements.list.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-action]");
   if (!button) return;
   const definition = definitions[activeKey];
+  
   if (button.dataset.action === "edit") {
     try {
       const query = definition.singleton

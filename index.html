@@ -3,20 +3,42 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="The portfolio of Syum Teame Gebreyesus, a computer engineer and software developer based in Addis Ababa, Ethiopia."
-    />
+    
+    <!-- SEO Meta -->
+    <meta name="description" content="The portfolio of Syum Teame Gebreyesus, a computer engineer and software developer based in Addis Ababa, Ethiopia." />
     <meta name="theme-color" content="#0b1020" />
     <meta name="color-scheme" content="dark light" />
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Syum Teame Gebreyesus — Computer Engineer & Developer" />
+    <meta property="og:description" content="Building useful things with technology. Explore my projects, experience, and skills." />
+    <meta property="og:image" content="assets/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- JSON-LD Structured Data for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Syum Teame Gebreyesus",
+      "jobTitle": "Computer Engineer & Software Developer",
+      "url": "https://syumgebre1.github.io/syum-portfolio/",
+      "sameAs": [
+        "https://www.linkedin.com/in/syumgebre1",
+        "https://github.com/syum.gebre1"
+      ]
+    }
+    </script>
+
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <title>Syum Teame Gebreyesus — Computer Engineer & Developer</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Theme initialization (prevents flash of wrong theme) -->
     <script>
       (() => {
         let theme = null;
@@ -27,6 +49,7 @@
         document.documentElement.dataset.theme = theme;
       })();
     </script>
+    
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js" defer></script>
     <script type="module" src="portfolio-data.js"></script>
@@ -34,6 +57,8 @@
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    
+    <!-- HEADER -->
     <header class="site-header">
       <nav class="nav shell" aria-label="Main navigation">
         <a class="wordmark photo-wordmark" href="#home" aria-label="Syum Gebreyesus, home">
@@ -60,9 +85,14 @@
     </header>
 
     <main id="main">
+      <!-- HERO SECTION -->
       <section class="hero shell" id="home" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot"></span> <span data-profile="role-location">COMPUTER ENGINEER · ADDIS ABABA, ETHIOPIA</span></p>
+          <div class="hero-meta-row">
+            <p class="eyebrow"><span class="status-dot"></span> <span data-profile="role-location">COMPUTER ENGINEER · ADDIS ABABA, ETHIOPIA</span></p>
+            <!-- Availability Badge (populated by JS) -->
+            <span id="availability-badge" class="availability-badge" hidden></span>
+          </div>
           <h1 id="hero-title">Building useful<br />things with <span>technology.</span></h1>
           <p class="hero-intro" data-profile="summary">
             I’m Syum, a computer engineering graduate and software developer who enjoys turning ideas into thoughtful web and mobile experiences.
@@ -75,12 +105,8 @@
               Download CV
             </a>
           </div>
-          <div class="hero-facts" aria-label="Highlights">
-            <div><strong data-profile="cgpa">3.71/4.00</strong><small>University CGPA</small></div>
-            <div><strong data-profile="exit_score">90/100</strong><small>Exit exam score</small></div>
-            <div><strong data-profile="graduation_year">2026</strong><small>Computer engineering graduate</small></div>
-          </div>
         </div>
+        
         <div class="hero-art" aria-hidden="true">
           <div class="orbit orbit-one"></div>
           <div class="orbit orbit-two"></div>
@@ -89,20 +115,26 @@
             <img alt="" />
             <span class="monogram-fallback" aria-hidden="true">S<span>.</span></span>
           </div>
-          <div class="float-card card-code"><span class="card-icon">{ }</span><span>Full-stack<br />development</span></div>
-          <div class="float-card card-network"><span class="card-icon">⌘</span><span>Networks &<br />security</span></div>
-          <div class="hero-coordinate">09°01′N<br />38°45′E</div>
         </div>
+        
         <a class="scroll-cue" href="#about"><span></span> SCROLL TO DISCOVER</a>
       </section>
 
+      <!-- ABOUT SECTION -->
       <section class="section shell" id="about" aria-labelledby="about-title">
         <div class="section-heading">
           <p class="eyebrow">01 / A LITTLE ABOUT ME</p>
           <h2 id="about-title">Curious by nature.<br /><span>Engineer by training.</span></h2>
         </div>
         <div class="about-grid">
-          <p class="about-lead" data-profile="summary">I care about building technology that makes everyday experiences better—from smoother digital payments to tools that help people stay organized.</p>
+          <div>
+            <p class="about-lead" data-profile="summary">I care about building technology that makes everyday experiences better—from smoother digital payments to tools that help people stay organized.</p>
+            <!-- Currently learning block (populated by JS) -->
+            <div id="now-learning-block" class="now-learning-block" hidden>
+              <p class="eyebrow">CURRENTLY LEARNING</p>
+              <p data-profile="now_learning"></p>
+            </div>
+          </div>
           <div class="about-detail">
             <div data-profile="about"><p>I graduated from Aksum University with a BSc in Electrical and Computer Engineering, specializing in Computer Engineering. My experience spans the MERN stack, React Native, Python, databases, networking, and application security.</p><p>I enjoy learning with a team, solving practical problems, and paying attention to the details that make software reliable and easy to use.</p></div>
             <a class="text-link" data-profile="linkedin-about" href="https://www.linkedin.com/in/syumgebre1" target="_blank" rel="noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a>
@@ -114,6 +146,7 @@
         </div>
       </section>
 
+      <!-- PROJECTS SECTION -->
       <section class="section projects-section" id="projects" aria-labelledby="projects-title">
         <div class="shell">
           <div class="section-topline">
@@ -123,107 +156,50 @@
             </div>
             <p class="section-aside">Projects across web, mobile, payments, and network security.</p>
           </div>
-          <div class="project-grid" data-portfolio="projects">
-            <article class="project-card project-featured">
-              <div class="project-visual crime-visual" aria-hidden="true">
-                <div class="browser-frame"><div class="browser-dots"><i></i><i></i><i></i></div><div class="dashboard-preview"><div class="preview-sidebar"></div><div class="preview-content"><b></b><b></b><div class="preview-chart"></div><div class="preview-row"></div><div class="preview-row short"></div></div></div></div>
-                <span class="visual-label">01 — WEB APPLICATION</span>
-              </div>
-              <div class="project-info">
-                <div class="project-title-row"><h3>Crime Management System</h3><span class="project-arrow" aria-hidden="true">↗</span></div>
-                <p>A centralized web platform for managing crime records, with role-based access for administrators, officers, and users.</p>
-                <ul class="tag-list" aria-label="Technologies"><li>React.js</li><li>Node.js</li><li>MongoDB</li><li>REST APIs</li></ul>
-              </div>
-            </article>
-            <article class="project-card">
-              <div class="project-visual mobile-visual" aria-hidden="true">
-                <div class="phone-frame"><div class="phone-notch"></div><div class="phone-greeting">My tasks <span>☼</span></div><div class="phone-date">YOUR WEEK, AT A GLANCE</div><div class="phone-task"><i></i><span></span></div><div class="phone-task"><i></i><span></span></div><div class="phone-task done"><i>✓</i><span></span></div><div class="phone-task"><i></i><span></span></div><div class="phone-add">+</div></div>
-                <span class="visual-label">02 — MOBILE APP</span>
-              </div>
-              <div class="project-info">
-                <div class="project-title-row"><h3>School Task Manager</h3><span class="project-arrow" aria-hidden="true">↗</span></div>
-                <p>A cross-platform study companion for assignments, academic tasks, and exam reminders—with offline access.</p>
-                <ul class="tag-list" aria-label="Technologies"><li>React Native</li><li>SQLite</li><li>Offline-first</li></ul>
-              </div>
-            </article>
-            <article class="project-card">
-              <div class="project-visual payment-visual" aria-hidden="true">
-                <div class="payment-window"><div class="payment-top"><span>GAME<span class="accent-text">COIN</span></span><span class="payment-menu">☰</span></div><div class="payment-copy">POWER UP<br /><b>YOUR GAME.</b></div><div class="coin coin-one">G</div><div class="coin coin-two">G</div><div class="coin coin-three">G</div><div class="payment-button">GET COINS&nbsp; →</div></div>
-                <span class="visual-label">03 — INTERNSHIP PROJECT</span>
-              </div>
-              <div class="project-info">
-                <div class="project-title-row"><h3>Game Coin Platform</h3><span class="project-arrow" aria-hidden="true">↗</span></div>
-                <p>A full-stack virtual currency purchasing experience, integrating third-party payment gateway APIs.</p>
-                <ul class="tag-list" aria-label="Technologies"><li>React.js</li><li>Node.js</li><li>Payments</li></ul>
-              </div>
-            </article>
-            <article class="project-card">
-              <div class="project-visual network-visual" aria-hidden="true">
-                <div class="network-map"><div class="net-node central">CORE</div><div class="net-node n1">ADMIN</div><div class="net-node n2">LAB</div><div class="net-node n3">STAFF</div><div class="net-node n4">GUEST</div><div class="net-line l1"></div><div class="net-line l2"></div><div class="net-line l3"></div><div class="net-line l4"></div></div>
-                <span class="visual-label">04 — NETWORK DESIGN</span>
-              </div>
-              <div class="project-info">
-                <div class="project-title-row"><h3>Campus Network Design</h3><span class="project-arrow" aria-hidden="true">↗</span></div>
-                <p>A secure, scalable campus network simulation with segmented VLANs, routing, and traffic access controls.</p>
-                <ul class="tag-list" aria-label="Technologies"><li>Cisco Packet Tracer</li><li>VLANs</li><li>ACLs</li><li>DHCP / DNS</li></ul>
-              </div>
-            </article>
-          </div>
+          <!-- Project cards will be dynamically rendered here by portfolio-data.js -->
+          <div class="project-grid" data-portfolio="projects"></div>
         </div>
       </section>
 
+      <!-- EXPERIENCE SECTION -->
       <section class="section shell" id="experience" aria-labelledby="experience-title">
         <div class="section-topline experience-topline">
           <div class="section-heading"><p class="eyebrow">03 / EXPERIENCE</p><h2 id="experience-title">Learning by<br /><span>building together.</span></h2></div>
           <p class="section-aside">A hands-on start in a collaborative product team.</p>
         </div>
-        <article class="experience-card" data-portfolio="experience">
-          <div class="experience-date"><span>JUN — AUG</span><strong>2025</strong></div>
-          <div class="experience-main">
-            <p class="eyebrow">INTERNSHIP · ADDIS ABABA, ETHIOPIA</p>
-            <h3>Frontend Developer Intern <span>at Root Solution</span></h3>
-            <p>Built responsive web and mobile applications with React.js and React Native, including a game coin purchasing platform with payment gateway integration.</p>
-            <ul class="experience-points"><li>Worked in a six-person Agile team across planning, reviews, testing, and deployment.</li><li>Improved application performance with code optimization, lazy loading, and efficient state management.</li><li>Debugged and tested features to support clean, production-ready software.</li></ul>
-          </div>
-          <div class="experience-mark" aria-hidden="true">RS<span>↗</span></div>
-        </article>
+        <!-- Experience cards will be dynamically rendered here by portfolio-data.js -->
+        <div data-portfolio="experience"></div>
       </section>
 
+      <!-- SKILLS SECTION -->
       <section class="section skills-section" id="skills" aria-labelledby="skills-title">
         <div class="shell skills-layout">
           <div class="section-heading"><p class="eyebrow">04 / TOOLKIT</p><h2 id="skills-title">Tools for<br /><span>turning ideas real.</span></h2><p class="skills-intro">A growing toolkit built through coursework, projects, and hands-on experience.</p></div>
-          <div class="skills-list" data-portfolio="skills">
-            <div class="skill-row"><h3>Development</h3><p>JavaScript (ES6+), Python, HTML5, CSS3, React.js, React Native, Node.js, Express.js</p></div>
-            <div class="skill-row"><h3>Data & APIs</h3><p>MongoDB, SQLite, MySQL, RESTful APIs, payment gateway integration</p></div>
-            <div class="skill-row"><h3>Networks & security</h3><p>Cisco Packet Tracer, VLANs, ACLs, OSPF, EIGRP, DHCP, DNS</p></div>
-            <div class="skill-row"><h3>Tools & practice</h3><p>Git, GitHub, VS Code, Postman, Agile/Scrum, responsive design, debugging, testing</p></div>
-            <div class="skill-row"><h3>Beyond code</h3><p>Problem-solving, teamwork, communication, adaptability, time management, customer focus</p></div>
-          </div>
+          <!-- Skills rows will be dynamically rendered here by portfolio-data.js -->
+          <div class="skills-list" data-portfolio="skills"></div>
         </div>
       </section>
 
+      <!-- EDUCATION SECTION -->
       <section class="section shell education-section" id="education" aria-labelledby="education-title">
         <div class="section-heading"><p class="eyebrow">05 / EDUCATION</p><h2 id="education-title">A strong<br /><span>foundation.</span></h2></div>
-        <div class="education-content" data-portfolio="education">
-          <p class="eyebrow">BSc · COMPUTER ENGINEERING</p>
-          <h3>Electrical & Computer Engineering</h3>
-          <p class="education-school">Aksum University <span>·</span> Graduated June 2026</p>
-          <div class="education-stats"><div><strong data-profile="cgpa">3.71<span>/4.00</span></strong><small>CGPA</small></div><div><strong data-profile="exit_score">90<span>/100</span></strong><small>Exit examination</small></div></div>
-          <div class="coursework"><h4>Relevant coursework</h4><p>Data Structures & Algorithms · Software Engineering · Database Systems · Operating Systems · Computer Architecture · Embedded Systems · Computer Networks & Security · Web Development · Data Communication</p></div>
-          <div class="certifications"><h4>Certifications</h4><ul><li>MERN Stack: All You Need to Know with Practical Project <span>Udemy · 2025</span></li><li>Basics of Python <span>UniAthena · 2026</span></li><li>Employment Skills and Job-Readiness Training <span>CEED · 2026</span></li><li>Basics of AI <span>UniAthena · 2026</span></li></ul></div>
-        </div>
+        <!-- Education and Certs will be dynamically rendered here by portfolio-data.js -->
+        <div class="education-content" data-portfolio="education"></div>
       </section>
 
+      <!-- HIGHLIGHTS SECTION -->
       <section class="section shell highlights-section" id="highlights" aria-labelledby="highlights-title" data-portfolio="highlights" hidden>
         <div class="section-heading"><p class="eyebrow">06 / MORE ABOUT ME</p><h2 id="highlights-title">Highlights &<br /><span>languages.</span></h2></div>
         <div class="highlights-grid"></div>
       </section>
 
+      <!-- CONTACT SECTION -->
       <section class="contact-section" id="contact" aria-labelledby="contact-title">
         <div class="shell contact-inner">
           <p class="eyebrow">07 / WHAT’S NEXT?</p>
           <h2 id="contact-title">Let’s make<br /><span>something matter.</span></h2>
           <p class="contact-copy">Open to opportunities, collaborations, and good conversations about technology.</p>
+          
           <form id="contact-form" class="contact-form" novalidate>
             <div class="contact-form-row">
               <label for="contact-name">Your name <span aria-hidden="true">*</span><input id="contact-name" name="name" type="text" autocomplete="name" maxlength="120" required /></label>
@@ -233,18 +209,18 @@
             <label for="contact-message">Message <span aria-hidden="true">*</span><textarea id="contact-message" name="message" rows="5" maxlength="10000" required></textarea></label>
             <div class="contact-submit-row"><button class="button button-primary" type="submit">Send message <span aria-hidden="true">↗</span></button><p id="contact-form-status" class="contact-form-status" role="status" aria-live="polite"></p></div>
           </form>
+          
           <div class="contact-options" aria-label="Other ways to contact me">
-            <!-- WhatsApp — filled in by script.js from site_settings -->
             <a id="contact-whatsapp" class="contact-option contact-option-whatsapp" href="#" target="_blank" rel="noreferrer" aria-label="Contact Syum on WhatsApp" hidden>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.7a8.5 8.5 0 0 1-12.6 7.4L3 20l.9-4.7a8.5 8.5 0 1 1 16.6-3.6Z"/><path d="M8.5 8.2c.3-.6.6-.6.9-.6h.4c.2 0 .4.1.5.4l.7 1.7c.1.2 0 .4-.1.6l-.5.6c-.2.2-.2.4 0 .7.5.8 1.2 1.5 2.1 2 .3.2.5.2.7-.1l.7-.8c.2-.2.4-.2.6-.1l1.6.8c.2.1.4.2.4.4 0 .3-.2 1-.7 1.4-.5.5-1.2.7-1.9.6-1-.1-2.2-.7-3.4-1.7-1.4-1.2-2.4-2.8-2.6-3.8-.2-.9.1-1.6.6-2.1Z"/></svg>
               WhatsApp
             </a>
-            <!-- Telegram — filled in by script.js from site_settings -->
             <a id="contact-telegram" class="contact-option contact-option-telegram" href="#" target="_blank" rel="noreferrer" aria-label="Message Syum on Telegram" hidden>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-7.1 18-4.1-7.8L2 9.1 21 3Z"/><path d="m9.8 13.2 4.8-4.8"/></svg>
               Telegram
             </a>
           </div>
+          
           <a class="contact-email" data-profile="email-link" href="mailto:syum.gebre1@gmail.com">syum.gebre1@gmail.com <span aria-hidden="true">↗</span></a>
           <div class="contact-links"><a data-profile="linkedin-link" href="https://www.linkedin.com/in/syumgebre1" target="_blank" rel="noreferrer">LinkedIn ↗</a><a data-profile="github-link" href="https://github.com/syum.gebre1" target="_blank" rel="noreferrer">GitHub ↗</a><a data-profile="phone-link" href="tel:" hidden></a><span data-profile="location">Addis Ababa, Ethiopia</span></div>
         </div>
@@ -252,7 +228,12 @@
     </main>
 
     <footer class="site-footer">
-      <div class="shell footer-inner"><a class="wordmark photo-wordmark" href="#home" aria-label="Back to top"><img alt="" /><span class="logo-fallback" aria-hidden="true">STG<span>.</span></span></a><p>Designed & built by <span data-profile="name">Syum Teame Gebreyesus</span></p><p>© <span id="year">2026</span> · Made with intention. <a href="admin.html">Admin</a></p></div>
+      <div class="shell footer-inner">
+        <a class="wordmark photo-wordmark" href="#home" aria-label="Back to top"><img alt="" /><span class="logo-fallback" aria-hidden="true">STG<span>.</span></span></a>
+        <p>Designed & built by <span data-profile="name">Syum Teame Gebreyesus</span></p>
+        <!-- Admin link removed for privacy -->
+        <p>© <span id="year">2026</span> · Made with intention.</p>
+      </div>
     </footer>
   </body>
 </html>

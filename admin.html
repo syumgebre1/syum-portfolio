@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b1020" />
+    <meta name="robots" content="noindex, nofollow" /> <!-- Keep this page out of Google Search -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <title>Portfolio Admin — Syum</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,16 +17,21 @@
   <body>
     <header class="admin-topbar">
       <a class="admin-brand" href="index.html"><span class="brand-mark">STG<span>.</span></span><span>PORTFOLIO ADMIN</span></a>
-      <div class="topbar-actions"><a class="public-link" href="index.html" target="_blank" rel="noreferrer">View portfolio ↗</a><button id="sign-out" class="button button-quiet" type="button" hidden>Sign out</button></div>
+      <div class="topbar-actions">
+        <a class="public-link" href="index.html" target="_blank" rel="noreferrer">View portfolio ↗</a>
+        <button id="sign-out" class="button button-quiet" type="button" hidden>Sign out</button>
+      </div>
     </header>
 
     <main class="admin-main">
+      <!-- Setup Message (Shows if config is missing) -->
       <section id="setup-message" class="notice-card" hidden>
         <p class="eyebrow">ONE-TIME SETUP</p>
         <h1>Connect your Supabase project</h1>
         <p>The admin is ready, but the project URL and public anon key haven’t been added yet. Follow the checklist in <strong>SUPABASE-SETUP.md</strong>, then reopen this page.</p>
       </section>
 
+      <!-- Login Card (Shows if not signed in) -->
       <section id="login-card" class="login-card" hidden>
         <p class="eyebrow">PRIVATE CONTENT MANAGER</p>
         <h1>Welcome back.</h1>
@@ -38,23 +44,53 @@
         </form>
       </section>
 
+      <!-- Main Dashboard (Shows if signed in) -->
       <section id="dashboard" hidden>
-        <div class="dashboard-heading"><div><p class="eyebrow">YOUR WEBSITE, YOUR CONTENT</p><h1>Good to see you.</h1><p class="muted">Manage your public portfolio without editing code.</p></div><span class="secure-badge"><i></i> PRIVATE ADMIN</span></div>
+        <div class="dashboard-heading">
+          <div>
+            <p class="eyebrow">YOUR WEBSITE, YOUR CONTENT</p>
+            <h1>Good to see you.</h1>
+            <p class="muted">Manage your public portfolio without editing code.</p>
+          </div>
+          <span class="secure-badge"><i></i> PRIVATE ADMIN</span>
+        </div>
+        
         <div class="dashboard-layout">
-          <aside class="manager-sidebar" aria-label="Content sections"><p class="eyebrow">CONTENT</p><nav id="section-nav"></nav><p class="sidebar-note">Saved changes are published to your portfolio as soon as you save.</p></aside>
+          <!-- Sidebar Navigation -->
+          <aside class="manager-sidebar" aria-label="Content sections">
+            <p class="eyebrow">CONTENT</p>
+            <nav id="section-nav"></nav>
+            <p class="sidebar-note">Saved changes are published to your portfolio as soon as you save.</p>
+          </aside>
+
+          <!-- Main Content Area -->
           <section class="manager-panel" aria-live="polite">
-            <div class="panel-heading"><div><p id="section-kicker" class="eyebrow"></p><h2 id="section-title"></h2></div><button id="add-record" class="button button-primary" type="button">＋ Add new</button></div>
+            <div class="panel-heading">
+              <div>
+                <p id="section-kicker" class="eyebrow"></p>
+                <h2 id="section-title"></h2>
+              </div>
+              <button id="add-record" class="button button-primary" type="button">＋ Add new</button>
+            </div>
+            
             <p id="panel-message" class="panel-message" role="status"></p>
+            
+            <!-- Content Lists -->
             <div id="record-list" class="record-list"></div>
             <div id="message-list" class="message-list" hidden></div>
+            
+            <!-- Edit/Add Form -->
             <form id="record-form" class="record-form" hidden>
-              <div class="form-heading"><h3 id="form-title"></h3><button id="cancel-form" class="button button-quiet" type="button">Cancel</button></div>
+              <div class="form-heading">
+                <h3 id="form-title"></h3>
+                <button id="cancel-form" class="button button-quiet" type="button">Cancel</button>
+              </div>
               <div id="form-fields" class="form-fields"></div>
               <p id="form-error" class="form-message" role="status"></p>
               <button class="button button-primary" type="submit">Save changes <span aria-hidden="true">↗</span></button>
             </form>
 
-            <!-- SITE SETTINGS — WhatsApp + Telegram contact details -->
+            <!-- Site Settings (WhatsApp + Telegram) -->
             <section id="settings-panel" class="record-form" hidden>
               <div class="form-heading">
                 <h3>Contact details</h3>
@@ -62,37 +98,26 @@
               <form id="settings-form" class="form-stack">
                 <label>
                   WhatsApp number
-                  <input
-                    name="whatsapp_number"
-                    type="tel"
-                    inputmode="numeric"
-                    placeholder="251912345678"
-                    pattern="[0-9]{0,15}"
-                    autocomplete="off"
-                  />
+                  <input name="whatsapp_number" type="tel" inputmode="numeric" placeholder="251912345678" pattern="[0-9]{0,15}" autocomplete="off" />
                   <small class="muted">Digits only, with country code. No <code>+</code> or spaces.</small>
                 </label>
                 <label>
                   Telegram username
-                  <input
-                    name="telegram_username"
-                    type="text"
-                    placeholder="syum_teame"
-                    pattern="[A-Za-z0-9_]{0,32}"
-                    autocomplete="off"
-                  />
+                  <input name="telegram_username" type="text" placeholder="syum_teame" pattern="[A-Za-z0-9_]{0,32}" autocomplete="off" />
                   <small class="muted">Without the <code>@</code>. Letters, numbers, and underscore.</small>
                 </label>
                 <p id="settings-error" class="form-message" role="status"></p>
-                <button class="button button-primary" type="submit">
-                  Save contact details <span aria-hidden="true">↗</span>
-                </button>
+                <button class="button button-primary" type="submit">Save contact details <span aria-hidden="true">↗</span></button>
               </form>
             </section>
           </section>
         </div>
       </section>
     </main>
-    <footer class="admin-footer"><span>Syum Teame Gebreyesus · Portfolio CMS</span><a href="index.html">Back to portfolio</a></footer>
+    
+    <footer class="admin-footer">
+      <span>Syum Teame Gebreyesus · Portfolio CMS</span>
+      <a href="index.html">Back to portfolio</a>
+    </footer>
   </body>
 </html>

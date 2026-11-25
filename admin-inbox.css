@@ -1,1 +1,86 @@
-.message-list{display:grid;gap:11px}.inbox-message{padding:17px;border:1px solid rgba(223,230,255,.1);border-radius:6px;background:rgba(10,15,27,.42)}.inbox-message.is-unread{border-left:3px solid var(--accent)}.inbox-message-heading{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}.inbox-message-heading>div{display:grid;gap:5px}.inbox-message-heading strong{font-size:12px}.inbox-message-heading a{color:#aeb8cd;font-size:10px}.inbox-message-heading time{color:var(--soft);font-size:9px}.inbox-message h3{margin:14px 0 7px;font-size:12px}.inbox-message>p{margin:0;color:#c6cad5;font-size:11px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}.inbox-mark-read{margin-top:13px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--accent);padding:7px 9px;font-size:9px}.inbox-mark-read:hover{border-color:var(--accent)}.inbox-mark-read:disabled{opacity:.5;cursor:wait}@media(max-width:520px){.inbox-message-heading{flex-direction:column;gap:8px}}
+/* admin-inbox.css - Styles specifically for the Messages inbox */
+
+.message-list { display: flex; flex-direction: column; gap: 12px; }
+
+.inbox-message {
+  padding: 20px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inbox-message.is-unread {
+  border-left: 3px solid var(--accent);
+}
+
+.inbox-message.is-read {
+  opacity: 0.7;
+}
+
+.inbox-message-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.inbox-message-heading strong {
+  font-size: 14px;
+  display: block;
+  color: var(--ink);
+}
+
+.inbox-message-heading a {
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.inbox-message-heading a:hover {
+  text-decoration: underline;
+}
+
+.inbox-message-heading time {
+  font: 10px var(--mono);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.inbox-message h3 {
+  font-size: 14px;
+  margin: 0;
+  color: var(--ink);
+}
+
+.inbox-message p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--body-secondary);
+  margin: 0;
+  white-space: pre-wrap; /* Preserves line breaks in the message */
+}
+
+.inbox-mark-read {
+  align-self: flex-start;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--accent);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.inbox-mark-read:hover {
+  background: rgba(184,243,107,.1);
+  border-color: var(--accent);
+}
+
+.inbox-mark-read:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Syum Teame Gebreyesus — CV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="cv.css" />
+    <script type="module" src="cv.js"></script>
+  </head>
+  <body>
+    <!-- Floating print button (hidden when printing) -->
+    <div class="print-actions">
+      <button onclick="window.print()" class="print-btn">Download as PDF 🖨️</button>
+      <a href="index.html" class="back-btn">← Back to Portfolio</a>
+    </div>
+
+    <main class="cv-container" id="cv-content">
+      <!-- HEADER (Populated by JS) -->
+      <header class="cv-header">
+        <h1 data-profile="name">Syum Teame Gebreyesus</h1>
+        <p class="role" data-profile="role">Computer Engineer · Software Developer</p>
+        <div class="contact-info">
+          <span data-profile="email">syum.gebre1@gmail.com</span>
+          <span data-profile="phone"></span>
+          <span data-profile="location">Addis Ababa, Ethiopia</span>
+          <span data-profile="linkedin">LinkedIn</span>
+          <span data-profile="github">GitHub</span>
+        </div>
+      </header>
+
+      <!-- SUMMARY -->
+      <section class="cv-section">
+        <h2>Professional Summary</h2>
+        <p data-profile="summary"></p>
+      </section>
+
+      <!-- EXPERIENCE -->
+      <section class="cv-section">
+        <h2>Experience</h2>
+        <div data-portfolio="experience"></div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="cv-section">
+        <h2>Projects</h2>
+        <div data-portfolio="projects"></div>
+      </section>
+
+      <!-- EDUCATION -->
+      <section class="cv-section">
+        <h2>Education</h2>
+        <div data-portfolio="education"></div>
+      </section>
+
+      <!-- SKILLS -->
+      <section class="cv-section">
+        <h2>Skills</h2>
+        <div data-portfolio="skills"></div>
+      </section>
+
+      <!-- CERTIFICATES -->
+      <section class="cv-section">
+        <h2>Certifications</h2>
+        <div data-portfolio="certificates"></div>
+      </section>
+    </main>
+  </body>
+</html>
