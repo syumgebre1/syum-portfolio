@@ -134,7 +134,7 @@ const elements = {
   settingsError: document.querySelector("#settings-error"),
 };
 
-let activeKey = "projects";
+let activeKey = "overview";
 let activeRecord = null;
 
 // ---------------------------------------------------------------------------
@@ -207,6 +207,14 @@ function makeField(field, record = {}) {
 // ---------------------------------------------------------------------------
 function createNav() {
   elements.nav.replaceChildren();
+  const overviewButton = document.createElement("button");
+  overviewButton.type = "button";
+  overviewButton.className = "section-button";
+  overviewButton.dataset.section = "overview";
+  overviewButton.setAttribute("aria-current", String(activeKey === "overview"));
+  overviewButton.innerHTML = '<span>Overview</span>';
+  elements.nav.append(overviewButton);
+
   for (const [key, definition] of Object.entries(definitions)) {
     const button = document.createElement("button");
     button.type = "button";
@@ -252,6 +260,72 @@ function previewText(record) {
   if (activeKey === "education") return [record.institution, record.graduation_date].filter(Boolean).join(" · ");
   if (activeKey === "skills") return (record.items || []).join(" · ");
   return [record.category, record.details].filter(Boolean).join(" · ");
+}
+
+async function loadCounts() {
+  await Promise.all(Object.entries(definitions).map(async ([key, definition]) => {
+    if (definition.singleton) return;
+    const { count, error } = await supabase
+      .from(definition.table)
+      .select("id", { count: "exact", head: true });
+    if (!error) {
+      const badge = document.querySelector(`[data-count="${key}"]`);
+      if (badge) badge.textContent = String(count || 0);
+    }
+  }));
+
+  const { count, error } = await supabase
+    .from(TABLES.messages)
+    .select("id", { count: "exact", head: true })
+    .is("read_at", null);
+  if (!error) {
+    const badge = document.querySelector('[data-count="messages"]');
+    if (badge) badge.textContent = count ? `${count} new` : "0";
+  }
+}
+
+async function loadOverview() {
+  elements.list.hidden = false;
+  elements.messageList.hidden = true;
+  elements.settingsPanel.hidden = true;
+  elements.form.hidden = true;
+  elements.add.hidden = true;
+  elements.title.textContent = "Overview";
+  elements.kicker.textContent = "CONTENT / PORTFOLIO STATUS";
+  elements.message.textContent = "Loading portfolio status…";
+  elements.list.replaceChildren();
+
+  const sections = [
+    ["profile", "Profile", "Personal details, photo, and CV"],
+    ["projects", "Projects", "Your featured work"],
+    ["experience", "Experience", "Roles and employment"],
+    ["certificates", "Certificates", "Credentials and training"],
+    ["education", "Education", "Degrees and coursework"],
+    ["skills", "Skills", "Technical and professional skills"],
+  ];
+
+  const cards = await Promise.all(sections.map(async ([key, label, description]) => {
+    const definition = definitions[key];
+    let count = "—";
+    const query = definition.singleton
+      ? await supabase.from(definition.table).select("id").maybeSingle()
+      : await supabase.from(definition.table).select("id", { count: "exact", head: true });
+    if (!query.error) count = definition.singleton ? (query.data ? "1" : "0") : String(query.count || 0);
+    return { key, label, description, count };
+  }));
+
+  for (const card of cards) {
+    const row = document.createElement("article");
+    row.className = "overview-card";
+    row.innerHTML = `
+      <div><strong>${card.label}</strong><small>${card.description}</small></div>
+      <div class="overview-card-action"><span>${card.count}</span><button type="button" data-overview-section="${card.key}">Manage</button></div>
+    `;
+    elements.list.append(row);
+  }
+
+  await loadCounts();
+  elements.message.textContent = "Your portfolio content is saved to Supabase and published automatically.";
 }
 
 function renderRecords(records) {
@@ -351,14 +425,23 @@ async function loadMessages() {
   for (const message of data) {
     const article = document.createElement("article");
     article.className = `inbox-message${message.read_at ? " is-read" : " is-unread"}`;
-    article.innerHTML = `
-      <div class="inbox-message-heading">
-        <div><strong>${message.name}</strong><a href="mailto:${message.email}">${message.email}</a></div>
-        <time>${new Date(message.created_at).toLocaleString()}</time>
-      </div>
-      <h3>${message.subject || "No subject"}</h3>
-      <p>${message.message}</p>
-    `;
+    const heading = document.createElement("div");
+    heading.className = "inbox-message-heading";
+    const sender = document.createElement("div");
+    const name = document.createElement("strong");
+    name.textContent = message.name;
+    const email = document.createElement("a");
+    email.href = `mailto:${message.email}`;
+    email.textContent = message.email;
+    sender.append(name, email);
+    const time = document.createElement("time");
+    time.textContent = new Date(message.created_at).toLocaleString();
+    heading.append(sender, time);
+    const subject = document.createElement("h3");
+    subject.textContent = message.subject || "No subject";
+    const body = document.createElement("p");
+    body.textContent = message.message;
+    article.append(heading, subject, body);
     if (!message.read_at) {
       const markRead = document.createElement("button");
       markRead.type = "button";
@@ -475,6 +558,12 @@ async function saveRecord(event) {
   elements.formError.textContent = "";
   const definition = definitions[activeKey];
   const values = formData();
+  const submitButton = elements.form.querySelector('button[type="submit"]');
+  const originalLabel = submitButton?.textContent;
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "Saving…";
+  }
   
   try {
     await uploadSelectedFiles(values);
@@ -493,6 +582,11 @@ async function saveRecord(event) {
     elements.message.textContent = "Saved. Your portfolio is updated.";
   } catch (error) {
     showError(elements.formError, error);
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = originalLabel || "Save changes";
+    }
   }
 }
 
@@ -551,12 +645,18 @@ async function removeRecord(id) {
 // EVENT LISTENERS
 // ---------------------------------------------------------------------------
 function setSection(key) {
-  if (key !== "messages" && key !== "settings" && !definitions[key]) return;
+  if (key !== "overview" && key !== "messages" && key !== "settings" && !definitions[key]) return;
   activeKey = key;
   activeRecord = null;
   elements.form.hidden = true;
   createNav();
-  const load = key === "messages" ? loadMessages : key === "settings" ? showSettingsPanel : loadRecords;
+  const load = key === "overview"
+    ? loadOverview
+    : key === "messages"
+      ? loadMessages
+      : key === "settings"
+        ? showSettingsPanel
+        : loadRecords;
   load().catch((error) => showError(elements.message, error));
 }
 
@@ -564,7 +664,7 @@ async function startDashboard() {
   setSignedIn(true);
   createNav();
   try {
-    await loadRecords();
+    await loadOverview();
   } catch (error) {
     showError(elements.message, error);
   }
@@ -584,7 +684,16 @@ elements.loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   elements.loginError.textContent = "";
   const form = new FormData(elements.loginForm);
+  const submitButton = elements.loginForm.querySelector('button[type="submit"]');
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "Signing in…";
+  }
   const { error } = await supabase.auth.signInWithPassword({ email: form.get("email"), password: form.get("password") });
+  if (submitButton) {
+    submitButton.disabled = false;
+    submitButton.textContent = "Sign in ↗";
+  }
   if (error) showError(elements.loginError, error);
   else await startDashboard();
 });
@@ -595,9 +704,19 @@ elements.signOut.addEventListener("click", async () => {
   else setSignedIn(false);
 });
 
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_IN" && session) return;
+  if (event === "SIGNED_OUT") setSignedIn(false);
+});
+
 elements.nav.addEventListener("click", (event) => {
   const button = event.target.closest("[data-section]");
   if (button) setSection(button.dataset.section);
+});
+
+elements.list.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-overview-section]");
+  if (button) setSection(button.dataset.overviewSection);
 });
 
 elements.add.addEventListener("click", () => openForm());

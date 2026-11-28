@@ -66,6 +66,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; transition: background-color .24s ease, color .24s ease; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; }
@@ -252,6 +253,32 @@ h1, h2, h3, p { margin-top: 0; }
 .contact-option svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .contact-option-whatsapp svg { fill: none; }
 
+/* PASSWORD RECOVERY */
+.password-reset-overlay {
+  position: fixed; inset: 0; z-index: 30; display: grid; place-items: center;
+  padding: 24px; background: rgba(5, 8, 17, .78); backdrop-filter: blur(12px);
+}
+.password-reset-card {
+  width: min(460px, 100%); padding: 34px; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--panel); color: var(--ink);
+  box-shadow: 0 24px 80px rgba(0,0,0,.35);
+}
+.password-reset-card .eyebrow { margin-bottom: 12px; }
+.password-reset-card h1 { margin: 0 0 10px; font-size: clamp(26px, 5vw, 34px); letter-spacing: -.05em; }
+.password-reset-copy { margin-bottom: 24px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.password-reset-card label { display: block; margin: 16px 0 7px; font-size: 11px; font-weight: 700; }
+.password-reset-card input {
+  width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line);
+  border-radius: 5px; background: var(--input-bg); color: var(--ink); font: 13px var(--sans);
+}
+.password-reset-card input:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+.password-reset-card .button { width: 100%; justify-content: center; margin-top: 16px; border: 0; cursor: pointer; }
+.password-reset-card .button:disabled { cursor: wait; opacity: .65; }
+.password-reset-status { min-height: 18px; margin: 12px 0 0; color: var(--error); font-size: 12px; line-height: 1.6; }
+.password-reset-status.is-success { color: var(--accent); }
+.password-reset-admin-link { display: block; margin-top: 18px; color: var(--muted); font-size: 12px; text-align: center; }
+.password-reset-admin-link:hover { color: var(--accent); }
+
 /* FOOTER */
 .site-footer { border-top: 1px solid var(--footer-border); transition: border-color .24s ease; }
 .footer-inner { min-height: 74px; display: flex; align-items: center; justify-content: space-between; }
@@ -310,6 +337,7 @@ h1, h2, h3, p { margin-top: 0; }
   .hero { padding-top: 55px; }.hero-art { min-height: 280px; }.hero-monogram { width: 170px; height: 250px; font-size: 68px; }.orbit-one { width: 280px; height: 160px; }.orbit-two { width: 320px; height: 200px; }.orbit-three { width: 235px; height: 235px; }.hero h1 { font-size: 47px; }.hero-intro { font-size: 13px; }.hero-actions { gap: 18px; }.button { padding: 0 13px; }
   .section { padding-top: 72px; padding-bottom: 72px; }.section-heading h2 { font-size: 38px; }.project-grid { grid-template-columns: 1fr; }.project-visual { height: 235px; }.project-info p { min-height: unset; }.skill-row { grid-template-columns: 105px 1fr; gap: 13px; }.experience-card { gap: 14px; grid-template-columns: 56px 1fr; padding: 27px 0; }.experience-date { font-size: 8px; }.experience-date strong { font-size: 17px; }.experience-main h3 { font-size: 17px; line-height: 1.45; }.experience-main h3 span { display: block; }.experience-points li { font-size: 10px; }
   .certifications li { flex-direction: column; gap: 1px; }.contact-section { padding: 78px 0 65px; }.contact-form-row { grid-template-columns: 1fr; gap: 0; }.contact-form { padding: 17px; }.contact-submit-row { align-items: flex-start; flex-direction: column; }.contact-links { flex-wrap: wrap; gap: 13px 20px; }.footer-inner { padding: 20px 0; gap: 10px; flex-wrap: wrap; }.footer-inner p { width: calc(100% - 55px); text-align: right; }.footer-inner p:last-child { width: 100%; text-align: center; }.highlights-grid { grid-template-columns: 1fr; }
+  .password-reset-card { padding: 25px 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }

@@ -33,6 +33,7 @@ Deploy over HTTPS. Opening HTML directly with a `file://` URL is not suitable fo
 - Select an image or PDF in a file field to upload it. Uploads are limited to 10 MB per file by the admin form.
 - Save changes; the public portfolio reads the latest content from Supabase.
 - Select **Messages** in the admin navigation to view visitor messages and mark them as read.
+- If an admin password needs resetting, select the user under **Authentication → Users** and choose **Send password recovery**. The recovery link returns to the portfolio homepage, which displays the password form. Deploy the latest site files before sending a new recovery link; expired links must be resent.
 
 ## Contact form security
 
