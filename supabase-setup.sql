@@ -49,6 +49,9 @@ create table if not exists public.portfolio_projects (
   created_at timestamptz not null default now()
 );
 
+alter table public.portfolio_projects
+  add column if not exists repo_url text not null default '';
+
 -- ---------------------------------------------------------------------------
 -- CERTIFICATES
 -- ---------------------------------------------------------------------------

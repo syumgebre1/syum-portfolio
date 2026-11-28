@@ -35,6 +35,19 @@ Deploy over HTTPS. Opening HTML directly with a `file://` URL is not suitable fo
 - Select **Messages** in the admin navigation to view visitor messages and mark them as read.
 - If an admin password needs resetting, select the user under **Authentication → Users** and choose **Send password recovery**. The recovery link returns to the portfolio homepage, which displays the password form. Deploy the latest site files before sending a new recovery link; expired links must be resent.
 
+## Fixing a missing project source-code column
+
+If the admin reports `Could not find the 'repo_url' column of 'portfolio_projects' in the schema cache`, open the SQL Editor for the same Supabase project configured in `supabase-config.js` and run:
+
+```sql
+alter table public.portfolio_projects
+  add column if not exists repo_url text not null default '';
+
+notify pgrst, 'reload schema';
+```
+
+Then reload the admin page and save the project again. Confirm the selected Supabase project matches `SUPABASE_URL`; running this query in a different project will not fix the admin database.
+
 ## Contact form security
 
 - The public website can insert a contact message but cannot read, update, or delete submitted messages.
