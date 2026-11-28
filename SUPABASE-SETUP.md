@@ -35,18 +35,24 @@ Deploy over HTTPS. Opening HTML directly with a `file://` URL is not suitable fo
 - Select **Messages** in the admin navigation to view visitor messages and mark them as read.
 - If an admin password needs resetting, select the user under **Authentication → Users** and choose **Send password recovery**. The recovery link returns to the portfolio homepage, which displays the password form. Deploy the latest site files before sending a new recovery link; expired links must be resent.
 
-## Fixing a missing project source-code column
+## Fixing an outdated Supabase schema
 
-If the admin reports `Could not find the 'repo_url' column of 'portfolio_projects' in the schema cache`, open the SQL Editor for the same Supabase project configured in `supabase-config.js` and run:
+If the admin reports that a column such as `repo_url` or `availability_status` is missing from the schema cache, the existing database needs the additive migration below. Open the SQL Editor for the same Supabase project configured in `supabase-config.js` and run only this SQL:
 
 ```sql
+alter table public.portfolio_profile
+  add column if not exists now_learning text not null default '',
+  add column if not exists availability_status text not null default 'open',
+  add column if not exists available_from text not null default '',
+  add column if not exists cv_path text not null default '';
+
 alter table public.portfolio_projects
   add column if not exists repo_url text not null default '';
 
 notify pgrst, 'reload schema';
 ```
 
-Then reload the admin page and save the project again. Confirm the selected Supabase project matches `SUPABASE_URL`; running this query in a different project will not fix the admin database.
+Then reload the admin page and retry saving. Confirm the selected Supabase project matches `SUPABASE_URL`; running this query in a different project will not fix the admin database. Do not paste the JavaScript from `supabase-config.js` into the SQL Editor.
 
 ## Contact form security
 

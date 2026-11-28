@@ -34,6 +34,12 @@ create table if not exists public.portfolio_profile (
   updated_at timestamptz not null default now()
 );
 
+alter table public.portfolio_profile
+  add column if not exists now_learning text not null default '',
+  add column if not exists availability_status text not null default 'open',
+  add column if not exists available_from text not null default '',
+  add column if not exists cv_path text not null default '';
+
 -- ---------------------------------------------------------------------------
 -- PROJECTS
 -- ---------------------------------------------------------------------------
